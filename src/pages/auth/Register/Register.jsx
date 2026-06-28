@@ -1,5 +1,6 @@
-import { Input, Label, TextField, Button, RadioGroup, Radio, ErrorMessage} from "@heroui/react";
+import { Input, Label, TextField, Button, RadioGroup, Radio} from "@heroui/react";
 import {Controller, useForm} from "react-hook-form";
+import ValidationMessage from '../../../components/shared/ValidationMessage/ValidationMessage'
 
 export default function Register() {
 
@@ -9,7 +10,7 @@ export default function Register() {
       username: "",
       email: "",
       dateOfBirth: "",
-      gender: "male",
+      gender: "",
       password: "",
       rePassword: "",
     },
@@ -60,12 +61,7 @@ export default function Register() {
                     {...field}
                     placeholder="John Doe"
                   />
-
-                  {errors.name && touchedFields.name && (
-                    <ErrorMessage >
-                      {errors.name.message}
-                    </ErrorMessage>
-                  )}
+                  <ValidationMessage field={errors.name} isTouched={touchedFields.name}/>
                 </TextField>
               )}
             />
@@ -87,11 +83,8 @@ export default function Register() {
                 <TextField  fullWidth>
                   <Label>Username</Label>
                   <Input {...field} placeholder="Enter username" autoComplete="username" />
-                  {errors.username && touchedFields.username && (
-                    <ErrorMessage>
-                      {errors.username.message}
-                    </ErrorMessage>
-                  )}
+                  <ValidationMessage field={errors.username} isTouched={touchedFields.username}/>
+
                 </TextField>
               )}
             />
@@ -116,11 +109,8 @@ export default function Register() {
               <TextField fullWidth>
                 <Label>Email</Label>
                 <Input {...field} type="email" placeholder="Enter your email" autoComplete="email" />
-                {errors.email && touchedFields.email && (
-                    <ErrorMessage>
-                      {errors.email.message}
-                    </ErrorMessage>
-                  )}
+                 <ValidationMessage field={errors.email} isTouched={touchedFields.email}/>
+                
               </TextField>
             )}
           />
@@ -133,7 +123,7 @@ export default function Register() {
                 {
                   required:{
                     value:true,
-                    message:"Email is required"
+                    message:"Date of Birth is required"
                   },
           
                   validate: function(value) {
@@ -156,11 +146,8 @@ export default function Register() {
                 <TextField fullWidth>
                   <Label>Date of Birth</Label>
                   <Input {...field} type="date" placeholder="Enter your date of birth" />
-                  {errors.dateOfBirth && touchedFields.dateOfBirth && (
-                    <ErrorMessage>
-                      {errors.dateOfBirth.message}
-                    </ErrorMessage>
-                  )}
+                  <ValidationMessage field={errors.dateOfBirth} isTouched={touchedFields.dateOfBirth}/>
+                  
                 </TextField>
               )}
             />
@@ -172,8 +159,17 @@ export default function Register() {
               <Controller
                 name="gender"
                 control={control}
+                rules={
+                  {
+                    required:{
+                      value:true,
+                      message:"Gender is required"
+                    }
+
+                  }
+                }
                 render={({field}) => (
-                  <RadioGroup aria-labelledby="gender-label" value={field.value} onValueChange={field.onChange} orientation="horizontal">
+                  <RadioGroup aria-labelledby="gender-label" {...field} orientation="horizontal">
                     <Radio value="male">
                       <Radio.Content>
                         <Radio.Control>
@@ -191,8 +187,10 @@ export default function Register() {
                       </Radio.Content>
                     </Radio>
                   </RadioGroup>
+                  
                 )}
               />
+                <ValidationMessage field={errors.gender} isTouched={touchedFields.gender}/>
             </div>
           </div>
 
@@ -204,7 +202,7 @@ export default function Register() {
                 {
                   required:{
                     value:true,
-                    message:"Email is required"
+                    message:"Password is required"
                   },
                   pattern:{
                     value: /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$/,
@@ -216,11 +214,8 @@ export default function Register() {
                 <TextField fullWidth>
                   <Label>Password</Label>
                   <Input {...field} type="password" placeholder="••••••••" autoComplete="new-password" />
-                    {errors.password && touchedFields.password && (
-                    <ErrorMessage>
-                      {errors.password.message}
-                    </ErrorMessage>
-                  )}
+                  <ValidationMessage field={errors.password} isTouched={touchedFields.password}/>
+                    
                 </TextField>
               )}
             />
