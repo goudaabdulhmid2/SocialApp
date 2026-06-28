@@ -10,8 +10,7 @@ import {router} from './routing/AppRouting.jsx'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <RouterProvider router={router}>
-
-    <App />
+        <App />
     </RouterProvider>
   </StrictMode>,
 )

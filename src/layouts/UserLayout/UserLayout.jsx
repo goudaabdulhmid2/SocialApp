@@ -1,12 +1,10 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet } from "react-router-dom"
 
-export default class UserLayout  {
-  
-
-  render() {
-    return <>
-     UserLayout
-     <Outlet/>
+export default function UserLayout() {
+  return (
+    <>
+      <div>UserLayout</div>
+      <Outlet/>
     </>
-  }
+  )
 }
