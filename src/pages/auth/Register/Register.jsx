@@ -1,10 +1,47 @@
-import { Input, Label, TextField, Button, RadioGroup, Radio} from "@heroui/react";
-import {Controller, useForm} from "react-hook-form";
-import ValidationMessage from '../../../components/shared/ValidationMessage/ValidationMessage'
+import { Input, Label, TextField, RadioGroup, Radio, Alert } from "@heroui/react";
+import { Controller, useForm } from "react-hook-form";
+import ValidationMessage from '../../../components/shared/ValidationMessage/ValidationMessage';
+import SubmitButton from "../../../components/shared/submitButton/SubmitButton";
+
+import * as z from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+const API_URL = 'https://route-posts.routemisr.com/users/signup';
+
+const registerSchema = z.object({
+  name: z.string().nonempty('Name is required').min(3, 'Min length is 3'),
+
+  username: z.string().nonempty('Username is required'),
+
+  email: z.email("Please enter a valid email address").nonempty('Email is required'),
+
+  dateOfBirth: z.coerce.date().refine(
+    (val) => new Date().getFullYear() - val.getFullYear() > 16,
+    "Age must be above 16 years"
+  ).transform(
+    (date) => `${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()}`
+  ),
+
+  gender: z.enum(['male', 'female'], 'Gender must be male or female'),
+
+  password: z.string()
+    .regex(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$/)
+    .nonempty('Password is required'),
+
+  rePassword: z.string()
+    .regex(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$/),
+});
 
 export default function Register() {
-
-  const {control, handleSubmit, formState:{errors, touchedFields}} = useForm({
+  const {
+    register,
+    control,
+    handleSubmit,
+    
+  } = useForm({
     defaultValues: {
       name: "",
       username: "",
@@ -14,14 +51,51 @@ export default function Register() {
       password: "",
       rePassword: "",
     },
-    mode:"onSubmit" // byDefault
+    mode: "onSubmit",
+    resolver: zodResolver(registerSchema),
+  });
+
+  const [apiError, setApiError] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
+  const navigate = useNavigate()
+  let timeOut = useRef(null)
+
+  useEffect(()=>{
+    console.log('ddd');
+
+    return () => {
+      clearTimeout(timeOut)
+    }
+    
   })
 
-  function onSubmitRegister(data){
-    
-    console.log(data)
+  async function onSubmitRegister(data) {
+    try {
+      const res = await axios.request({
+        method: 'POST',
+        url: API_URL,
+        data,
+      });
+      console.log(res);
+      
+      if(res.error){
+        throw new Error(res.error);
+      }
+      
+      setSuccessMessage('Register done successfully')
+
+      timeOut = setTimeout(()=>{
+        navigate('/auth/login')
+        
+      },2000)
+
+    } catch (error) {
+      const errorMsg = error.response?.data?.message || "Something went wrong";
+      console.log(errorMsg);
+      setApiError(errorMsg);
+    }
   }
- 
+
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.16),transparent_32%),linear-gradient(180deg,#f8fafc_0%,#ecfdf5_100%)] px-4 py-12">
       <div className="mx-auto mt-8 w-full max-w-2xl rounded-3xl border border-emerald-100 bg-white/90 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.12)] backdrop-blur md:p-10">
@@ -37,121 +111,41 @@ export default function Register() {
 
         <form onSubmit={handleSubmit(onSubmitRegister)} className="mt-8 grid gap-4">
           <div className="grid gap-4 md:grid-cols-2">
-            <Controller
-              name="name"
-              control={control}
-              rules={
-                {
-                  required:{
-                    value:true,
-                    message:"Name is required"
-                  },
-                  minLength:{
-                    value:3,
-                    message:"Min length is 3"
-                  }
-                }
-              }
-              
-              render={({field}) => (
-                <TextField  fullWidth>
-                  <Label>Full Name</Label>
 
-                  <Input
-                    {...field}
-                    placeholder="John Doe"
-                  />
-                  <ValidationMessage field={errors.name} isTouched={touchedFields.name}/>
-                </TextField>
-              )}
-            />
+            
+            <TextField fullWidth>
+              <Label>Full Name</Label>
+              <Input {...register("name")} placeholder="John Doe" />
+              {/* <ValidationMessage field={errors.name} isTouched={touchedFields.name} /> */}
+              <ValidationMessage name='name' control={control} />
+            </TextField>
 
-           
+            <TextField fullWidth>
+              <Label>Username</Label>
+              <Input {...register("username")} placeholder="Enter username" autoComplete="username" />
+              {/* <ValidationMessage field={errors.username} isTouched={touchedFields.username} /> */}
+              <ValidationMessage name='username' control={control} />
+            </TextField>
 
-            <Controller
-              name="username"
-              control={control}
-              rules={
-                {
-                  required:{
-                    value:true,
-                    message:"UserName is required"
-                  }
-                }
-              }
-              render={({field}) => (
-                <TextField  fullWidth>
-                  <Label>Username</Label>
-                  <Input {...field} placeholder="Enter username" autoComplete="username" />
-                  <ValidationMessage field={errors.username} isTouched={touchedFields.username}/>
-
-                </TextField>
-              )}
-            />
           </div>
 
-          <Controller
-            name="email"
-            control={control}
-            rules={
-                {
-                  required:{
-                    value:true,
-                    message:"Email is required"
-                  },
-                  pattern: {
-                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                    message: "Please enter a valid email address",
-                  },
-                }
-              }
-            render={({field}) => (
-              <TextField fullWidth>
-                <Label>Email</Label>
-                <Input {...field} type="email" placeholder="Enter your email" autoComplete="email" />
-                 <ValidationMessage field={errors.email} isTouched={touchedFields.email}/>
-                
-              </TextField>
-            )}
-          />
+          <TextField fullWidth>
+            <Label>Email</Label>
+            <Input {...register("email")} type="email" placeholder="Enter your email" autoComplete="email" />
+            {/* <ValidationMessage field={errors.email} isTouched={touchedFields.email} /> */}
+            <ValidationMessage name='email' control={control} />
+          </TextField>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <Controller
-              name="dateOfBirth"
-              control={control}
-              rules={
-                {
-                  required:{
-                    value:true,
-                    message:"Date of Birth is required"
-                  },
-          
-                  validate: function(value) {
-                    const birthDate = new Date(value);
-                    const currentYear = new Date().getFullYear();
 
-                    if (Number.isNaN(birthDate.getTime())) {
-                      return "Invalid date";
-                    }
+            <TextField fullWidth>
+              <Label>Date of Birth</Label>
+              <Input {...register("dateOfBirth")} type="date" placeholder="Enter your date of birth" />
+              {/* <ValidationMessage field={errors.dateOfBirth} isTouched={touchedFields.dateOfBirth} /> */}
+              <ValidationMessage name='dateOfBirth' control={control} />
+            </TextField>
 
-                    if (currentYear - birthDate.getFullYear() >= 16) {
-                      return true;
-                    }
-                    
-                    return "You must be at least 16 years old";
-                  }
-                }
-              }
-              render={({field}) => (
-                <TextField fullWidth>
-                  <Label>Date of Birth</Label>
-                  <Input {...field} type="date" placeholder="Enter your date of birth" />
-                  <ValidationMessage field={errors.dateOfBirth} isTouched={touchedFields.dateOfBirth}/>
-                  
-                </TextField>
-              )}
-            />
-
+            
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
               <Label id="gender-label" className="mb-3 block text-sm font-medium text-slate-700">
                 Select your Gender
@@ -159,16 +153,7 @@ export default function Register() {
               <Controller
                 name="gender"
                 control={control}
-                rules={
-                  {
-                    required:{
-                      value:true,
-                      message:"Gender is required"
-                    }
-
-                  }
-                }
-                render={({field}) => (
+                render={({ field }) => (
                   <RadioGroup aria-labelledby="gender-label" {...field} orientation="horizontal">
                     <Radio value="male">
                       <Radio.Content>
@@ -187,56 +172,60 @@ export default function Register() {
                       </Radio.Content>
                     </Radio>
                   </RadioGroup>
-                  
                 )}
               />
-                <ValidationMessage field={errors.gender} isTouched={touchedFields.gender}/>
+              {/* <ValidationMessage field={errors.gender} isTouched={touchedFields.gender} /> */}
+              <ValidationMessage name='gender' control={control} />
+
             </div>
+
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <Controller
-              name="password"
-              control={control}
-              rules={
-                {
-                  required:{
-                    value:true,
-                    message:"Password is required"
-                  },
-                  pattern:{
-                    value: /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$/,
-                    message:"Invalid Password"
-                  }
-                }
-              }
-              render={({field}) => (
-                <TextField fullWidth>
-                  <Label>Password</Label>
-                  <Input {...field} type="password" placeholder="••••••••" autoComplete="new-password" />
-                  <ValidationMessage field={errors.password} isTouched={touchedFields.password}/>
-                    
-                </TextField>
-              )}
-            />
 
-            <Controller
-              name="rePassword"
-              control={control}
-              render={({field}) => (
-                <TextField fullWidth>
-                  <Label>Confirm Password</Label>
-                  <Input {...field} type="password" placeholder="••••••••" autoComplete="new-password" />
-                </TextField>
-              )}
-            />
+            <TextField fullWidth>
+              <Label>Password</Label>
+              <Input {...register("password")} type="password" placeholder="••••••••" autoComplete="new-password" />
+              {/* <ValidationMessage field={errors.password} isTouched={touchedFields.password} /> */}
+              <ValidationMessage name='password' control={control} />
+
+            </TextField>
+
+            <TextField fullWidth>
+              <Label>Confirm Password</Label>
+              <Input {...register("rePassword")} type="password" placeholder="••••••••" autoComplete="new-password" />
+              {/* <ValidationMessage field={errors.rePassword} isTouched={touchedFields.rePassword} /> */}
+              <ValidationMessage name='rePassword' control={control} />
+
+            </TextField>
+
           </div>
 
-          <Button fullWidth type="submit" className="mt-2 h-12 font-semibold">
-            Register
-          </Button>
-      </form>
+          <SubmitButton control={control}></SubmitButton>
+
+          {apiError &&
+              <Alert status="danger">
+                  <Alert.Indicator />
+                  <Alert.Content>
+                    <Alert.Title>{apiError}</Alert.Title>
+                    <Alert.Description />
+                  </Alert.Content>
+              </Alert>
+           }
+          
+          {successMessage &&
+              <Alert status="success">
+                  <Alert.Indicator />
+                  <Alert.Content>
+                    <Alert.Title>{successMessage}</Alert.Title>
+                    <Alert.Description />
+                  </Alert.Content>
+              </Alert>
+           }
+          
+
+        </form>
+      </div>
     </div>
-    </div>
-  )
+  );
 }
