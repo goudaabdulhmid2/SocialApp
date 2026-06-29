@@ -58,7 +58,7 @@ export default function Register() {
   const [apiError, setApiError] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
   const navigate = useNavigate()
-  let timeOut = useRef(null)
+  let timeOut = 0
 
   useEffect(()=>{
     console.log('ddd');
