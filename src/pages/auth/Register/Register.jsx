@@ -2,38 +2,16 @@ import { Input, Label, TextField, RadioGroup, Radio, Alert } from "@heroui/react
 import { Controller, useForm } from "react-hook-form";
 import ValidationMessage from '../../../components/shared/ValidationMessage/ValidationMessage';
 import SubmitButton from "../../../components/shared/submitButton/SubmitButton";
+import { registerSchema } from "../../../schemas/register.schema";
 
-import * as z from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { Link } from "react-router-dom";
 const API_URL = 'https://route-posts.routemisr.com/users/signup';
 
-const registerSchema = z.object({
-  name: z.string().nonempty('Name is required').min(3, 'Min length is 3'),
 
-  username: z.string().nonempty('Username is required'),
-
-  email: z.email("Please enter a valid email address").nonempty('Email is required'),
-
-  dateOfBirth: z.coerce.date().refine(
-    (val) => new Date().getFullYear() - val.getFullYear() > 16,
-    "Age must be above 16 years"
-  ).transform(
-    (date) => `${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()}`
-  ),
-
-  gender: z.enum(['male', 'female'], 'Gender must be male or female'),
-
-  password: z.string()
-    .regex(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$/)
-    .nonempty('Password is required'),
-
-  rePassword: z.string()
-    .regex(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$/),
-});
 
 export default function Register() {
   const {
@@ -51,26 +29,33 @@ export default function Register() {
       password: "",
       rePassword: "",
     },
-    mode: "onSubmit",
+    mode: "onChange",
     resolver: zodResolver(registerSchema),
   });
 
   const [apiError, setApiError] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
+
   const navigate = useNavigate()
-  let timeOut = 0
 
   useEffect(()=>{
-    console.log('ddd');
+    if(!successMessage) return
+
+    const timeoutId = setTimeout(()=>{
+        navigate('/login')
+        
+      },1500);
 
     return () => {
-      clearTimeout(timeOut)
+      clearTimeout(timeoutId)
     }
     
-  })
+  }, [navigate, successMessage])
 
   async function onSubmitRegister(data) {
     try {
+      
+      setApiError('')
       const res = await axios.request({
         method: 'POST',
         url: API_URL,
@@ -84,16 +69,14 @@ export default function Register() {
       
       setSuccessMessage('Register done successfully')
 
-      timeOut = setTimeout(()=>{
-        navigate('/auth/login')
-        
-      },2000)
+      
 
     } catch (error) {
       const errorMsg = error.response?.data?.message || "Something went wrong";
       console.log(errorMsg);
       setApiError(errorMsg);
     }
+   
   }
 
   return (
@@ -201,8 +184,9 @@ export default function Register() {
 
           </div>
 
-          <SubmitButton control={control}></SubmitButton>
+          <SubmitButton control={control} submitLabel={'Register'} ></SubmitButton>
 
+          <Link className="text-blue-600" to={'/login'}>Already have an account, go to Login</Link>
           {apiError &&
               <Alert status="danger">
                   <Alert.Indicator />

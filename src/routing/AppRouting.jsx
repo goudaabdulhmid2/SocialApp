@@ -5,8 +5,8 @@ import AuthLayout from '../layouts/AuthLayout/AuthLayout'
 import Home from '../pages/Home/Home'
 import Profile from '../pages/Profile/Profile'
 import NotFound from '../pages/NotFound/NotFound'
-import Login from '../pages/auth/Login/Login'
-import Register from '../pages/auth/Register/Register'
+import Login from "../pages/auth/Login/Login";
+import Register from "../pages/auth/Register/Register";
 
 
 export  const router = createBrowserRouter([
@@ -25,7 +25,7 @@ export  const router = createBrowserRouter([
         ]
     },
     {
-        path:'auth',
+        path:'',
         element:<AuthLayout/>,
         children:[
             {
