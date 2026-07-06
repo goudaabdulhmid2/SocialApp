@@ -7,6 +7,8 @@ import Profile from '../pages/Profile/Profile'
 import NotFound from '../pages/NotFound/NotFound'
 import Login from "../pages/auth/Login/Login";
 import Register from "../pages/auth/Register/Register";
+import ProtectedAuthRoutes from "./ProtectedAuthRoutes";
+import ProtectedRoute from "./ProtectedRoute";
 
 
 export  const router = createBrowserRouter([
@@ -16,11 +18,15 @@ export  const router = createBrowserRouter([
         children: [
             {
                 index:true,
-                element:<Home/>
+                element:<ProtectedRoute>
+                    <Home/>
+                </ProtectedRoute>
             },
             {
                 path:'profile',
-                element:<Profile/>
+                element: <ProtectedRoute>
+                    <Profile/>
+                    </ProtectedRoute>
             }
         ]
     },
@@ -30,12 +36,16 @@ export  const router = createBrowserRouter([
         children:[
             {
                 path:"login",
-                element:<Login/>
+                element:<ProtectedAuthRoutes>
+                            <Login/>
+                    </ProtectedAuthRoutes>
             },
 
             {
                 path:'register',
-                element:<Register/>
+                element:<ProtectedAuthRoutes>
+                    <Register/>
+                </ProtectedAuthRoutes>
             }
         ]
     },
