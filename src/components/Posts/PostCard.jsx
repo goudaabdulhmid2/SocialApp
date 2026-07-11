@@ -1,5 +1,5 @@
 import {Card} from "@heroui/react";
-import {FaCommentDots, FaHeart, FaImage, FaShareNodes, FaBookmark} from "react-icons/fa6";
+import {FaCommentDots, FaHeart, FaImage, FaShareAlt, FaBookmark} from "react-icons/fa";
 
 import Comments from '../Comments/Comments'
 import { useState } from "react";
@@ -25,7 +25,7 @@ export default function PostCard({ post }) {
   }
 
   return (
-    <Card className="overflow-hidden border border-default-200 bg-white shadow-sm transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-md">
+    <Card className=" overflow-hidden border border-default-200 bg-white shadow-sm transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-md">
       <div className="p-4 sm:p-5 md:p-6">
         <div className="flex items-start gap-3 sm:gap-4">
           <img
@@ -79,7 +79,7 @@ export default function PostCard({ post }) {
             {post?.commentsCount ?? 0}
           </button>
           <span className="inline-flex items-center gap-1.5 rounded-full bg-default-100 px-3 py-1.5 font-medium">
-            <FaShareNodes className="text-secondary" />
+            <FaShareAlt className="text-secondary" />
             {post?.sharesCount ?? 0}
           </span>
           {post?.bookmarked ? (

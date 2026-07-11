@@ -43,8 +43,8 @@ export default function Posts() {
 
 
   return (
-    <section className="py-12">
-                <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 rounded bg-white p-4 shadow-olive-200 sm:p-6 lg:p-10">
+    <section >
+                <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 rounded bg-white shadow-olive-200 sm:py-6 lg:py-10">
                         {isLoading ? (
                             <div className="flex min-h-48 items-center justify-center">
                                 <Spinner size="lg" label="Loading posts" />

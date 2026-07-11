@@ -21,12 +21,13 @@ const authLinks = [
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const { token, removeToken} = useContext(AuthContext);
+  const { token, removeToken, removeUsreData} = useContext(AuthContext);
 
   const handleUserAction = (action) => {
     if (action === "logout") {
       setIsMenuOpen(false);
       removeToken()
+      removeUsreData()
       navigate("/login");
       return;
     }

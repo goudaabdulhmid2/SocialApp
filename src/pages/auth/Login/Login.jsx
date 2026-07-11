@@ -32,7 +32,7 @@ export default function Login() {
 
   const [apiError, setApiError] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
-  const {saveToken} = useContext(AuthContext)
+  const {saveToken, saveUsreData} = useContext(AuthContext)
 
   const navigate = useNavigate()
 
@@ -63,7 +63,7 @@ export default function Login() {
       
       setSuccessMessage('Login done successfully')
       saveToken(res.data.data.token)
-
+      saveUsreData(JSON.stringify(res.data.data.user))
 
     } catch (error) {
       const errorMsg = error.response?.data?.message || "Something went wrong";
