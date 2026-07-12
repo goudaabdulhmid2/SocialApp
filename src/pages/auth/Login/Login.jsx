@@ -5,13 +5,12 @@ import SubmitButton from "../../../components/shared/submitButton/SubmitButton";
 import { loginSchema } from "../../../schemas/auth/login.schema";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../../context/AuthContext";
+import AuthServices from "../../../services/AuthServices";
 
-const API_URL = 'https://route-posts.routemisr.com/users/signin';
 
 
 export default function Login() {
@@ -51,11 +50,7 @@ export default function Login() {
     try {
       setApiError('')
 
-      const res = await axios.request({
-        method: 'POST',
-        url: API_URL,
-        data,
-      });
+      const res = await AuthServices.signIn(data)
       
       if(res.error){
         throw new Error(res.error);

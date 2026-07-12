@@ -5,11 +5,10 @@ import SubmitButton from "../../../components/shared/submitButton/SubmitButton";
 import { registerSchema } from "../../../schemas/auth/register.schema";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-const API_URL = 'https://route-posts.routemisr.com/users/signup';
+import AuthServices from "../../../services/AuthServices";
 
 
 
@@ -56,11 +55,7 @@ export default function Register() {
     try {
       
       setApiError('')
-      const res = await axios.request({
-        method: 'POST',
-        url: API_URL,
-        data,
-      });
+      const res = await AuthServices.signUp(data)
       console.log(res);
       
       if(res.error){

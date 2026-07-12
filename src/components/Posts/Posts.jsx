@@ -1,7 +1,7 @@
-import axios from "axios";
 import PostCard from "./PostCard";
 import { useEffect, useState } from "react";
 import { Spinner } from "@heroui/react";
+import PostServices from "../../services/PostServices";
 
 export default function Posts({ refreshTrigger }) {
     const [posts, setPosts] = useState([])
@@ -11,19 +11,7 @@ export default function Posts({ refreshTrigger }) {
     async function getAllPosts(){
         setLoading(true)
         try{
-            const {data} = await axios.request({
-                method:'GET',
-                url:'https://route-posts.routemisr.com/posts',
-                headers:{
-                    Token:localStorage.getItem("userToken")
-                },
-                params:{
-                    limit:20,
-                    sort:"-createdAt"
-                }
-
-            
-            })
+            const data = await PostServices.getPosts()
             setPosts(data.data.posts)
 
             console.log(data.data.posts);

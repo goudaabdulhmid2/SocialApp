@@ -6,11 +6,12 @@ import createPostSchema from "../../schemas/posts/createPost.schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import ValidationMessage from "../shared/ValidationMessage/ValidationMessage";
-import axios from "axios";
+
 import SubmitButton from "../shared/submitButton/SubmitButton";
+import PostServices from "../../services/PostServices";
 
 export default function CreatePost({ onPostCreated }) {
-  const { userData, token } = useContext(AuthContext);
+  const { userData } = useContext(AuthContext);
   const { photo, name } = userData;
   
   
@@ -28,14 +29,7 @@ export default function CreatePost({ onPostCreated }) {
         formData.append('image', data.image[0]);
       }
 
-      const res = await axios.request({
-        method: 'POST',
-        url: 'https://route-posts.routemisr.com/posts',
-        data: formData,
-        headers: {
-          Token: token,
-        },
-      });
+      const res = await PostServices.creatPost(formData)
 
       console.log(res);
       reset({ body: "", image: null });
