@@ -3,7 +3,7 @@ import PostCard from "./PostCard";
 import { useEffect, useState } from "react";
 import { Spinner } from "@heroui/react";
 
-export default function Posts() {
+export default function Posts({ refreshTrigger }) {
     const [posts, setPosts] = useState([])
     const [isLoading, setLoading] = useState(false)
     
@@ -37,8 +37,8 @@ export default function Posts() {
 
 
     useEffect(() => {
-        Promise.resolve().then(getAllPosts)
-    }, [])
+        getAllPosts()
+    }, [refreshTrigger])
 
 
 

@@ -2,7 +2,7 @@ import { Input, Label, TextField, RadioGroup, Radio, Alert } from "@heroui/react
 import { Controller, useForm } from "react-hook-form";
 import ValidationMessage from '../../../components/shared/ValidationMessage/ValidationMessage';
 import SubmitButton from "../../../components/shared/submitButton/SubmitButton";
-import { registerSchema } from "../../../schemas/register.schema";
+import { registerSchema } from "../../../schemas/auth/register.schema";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
@@ -184,7 +184,7 @@ export default function Register() {
 
           </div>
 
-          <SubmitButton control={control} submitLabel={'Register'} ></SubmitButton>
+          <SubmitButton control={control} submitLabel={'Register'} action={'Submitting...'} ></SubmitButton>
 
           <Link className="text-blue-600" to={'/login'}>Already have an account, go to Login</Link>
           {apiError &&

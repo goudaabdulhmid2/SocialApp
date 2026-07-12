@@ -2,7 +2,7 @@ import { Input, Label, TextField, Alert } from "@heroui/react";
 import { useForm } from "react-hook-form";
 import ValidationMessage from '../../../components/shared/ValidationMessage/ValidationMessage';
 import SubmitButton from "../../../components/shared/submitButton/SubmitButton";
-import { loginSchema } from "../../../schemas/login.schema";
+import { loginSchema } from "../../../schemas/auth/login.schema";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
@@ -103,7 +103,7 @@ export default function Login() {
             </TextField>
 
 
-          <SubmitButton control={control} submitLabel={'Login'} ></SubmitButton>
+          <SubmitButton control={control} submitLabel={'Login'} action={'Submitting...'} ></SubmitButton>
           <Link className="text-blue-600" to={'/register'}>U don't have an account, Register now</Link>
 
           {apiError &&

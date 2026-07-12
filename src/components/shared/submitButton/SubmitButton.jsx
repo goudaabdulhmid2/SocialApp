@@ -2,7 +2,7 @@ import { useFormState } from 'react-hook-form'
 import {Button, Spinner} from "@heroui/react";
 
 
-export default function SubmitButton({ control, submitLabel }) {
+export default function SubmitButton({ control, submitLabel, action, icon: Icon }) {
 
     const {isSubmitting, isValid} = useFormState({control});
 
@@ -12,10 +12,13 @@ export default function SubmitButton({ control, submitLabel }) {
         {isSubmitting ?  
               <>
                   <Spinner color="current" size="sm" /> 
-                  Submitting...
+                  {action}
 
               </>
-        : submitLabel }
+        : <>
+            {submitLabel}
+            {Icon ? <Icon className="h-4 w-4" /> : null}
+          </> }
         
       
           </Button>
