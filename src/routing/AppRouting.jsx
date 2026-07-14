@@ -9,6 +9,7 @@ import Login from "../pages/auth/Login/Login";
 import Register from "../pages/auth/Register/Register";
 import ProtectedAuthRoutes from "./ProtectedAuthRoutes";
 import ProtectedRoute from "./ProtectedRoute";
+import PostDetails from "../pages/post-details/PostDetails";
 
 
 export  const router = createBrowserRouter([
@@ -27,6 +28,12 @@ export  const router = createBrowserRouter([
                 element: <ProtectedRoute>
                     <Profile/>
                     </ProtectedRoute>
+            },
+            {
+                path:'posts/:id',
+                element:<ProtectedRoute>
+                    <PostDetails/>
+                </ProtectedRoute>
             }
         ]
     },

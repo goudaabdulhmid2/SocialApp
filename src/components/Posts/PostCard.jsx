@@ -1,8 +1,9 @@
-import {Card} from "@heroui/react";
-import {FaCommentDots, FaHeart, FaImage, FaShareAlt, FaBookmark} from "react-icons/fa";
+import { Card, Spinner } from "@heroui/react";
+import { FaCommentDots, FaHeart, FaImage, FaShareAlt, FaBookmark, FaArrowRight } from "react-icons/fa";
 
 import Comments from '../Comments/Comments'
-import { useState } from "react";
+import ShowMoreCommantBtn from "../Comments/ShowMoreCommantBtn";
+import { Link } from "react-router-dom";
 
 function formatPostDate(dateValue) {
   if (!dateValue) return "Recently";
@@ -13,16 +14,13 @@ function formatPostDate(dateValue) {
   }).format(new Date(dateValue));
 }
 
-export default function PostCard({ post }) {
+export default function PostCard({ post, comments, getComments, pagination, loading, isDetails = false }) {
   const userName = post?.user?.name ?? "Unknown user";
   const userHandle = post?.user?.username ? `@${post.user.username}` : "@unknown";
   const userPhoto = post?.user?.photo;
   const postImage = post?.image;
-  const [isCommentClick, setCommentClick] = useState(false);
 
-  function handleCommentClick() {
-    setCommentClick((currentValue) => !currentValue);
-  }
+
 
   return (
     <Card className=" overflow-hidden border border-default-200 bg-white shadow-sm transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-md">
@@ -68,16 +66,12 @@ export default function PostCard({ post }) {
             <FaHeart className={post?.likesCount ? "text-danger" : "text-default-400"} />
             {post?.likesCount ?? 0}
           </span>
-          <button
-            type="button"
-            onClick={handleCommentClick}
-            className="inline-flex items-center gap-1.5 rounded-full bg-default-100 px-3 py-1.5 font-medium transition-colors hover:bg-default-200 focus:outline-none focus:ring-2 focus:ring-primary/40"
-            aria-expanded={isCommentClick}
-            aria-label="Toggle comments"
-          >
+
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-default-100 px-3 py-1.5 font-medium">
             <FaCommentDots className="text-primary" />
             {post?.commentsCount ?? 0}
-          </button>
+          </span>
+
           <span className="inline-flex items-center gap-1.5 rounded-full bg-default-100 px-3 py-1.5 font-medium">
             <FaShareAlt className="text-secondary" />
             {post?.sharesCount ?? 0}
@@ -94,9 +88,73 @@ export default function PostCard({ post }) {
               Image
             </span>
           ) : null}
+
+          {!isDetails && (
+            <Link
+              to={`/posts/${post?.id}`}
+              className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-primary-50 px-4 py-1.5 font-medium text-primary-600 transition-colors hover:bg-primary-100"
+            >
+              Details <FaArrowRight className="text-[10px]" />
+            </Link>
+          )}
         </div>
       </div>
-      {isCommentClick && post?.topComment ? <Comments comment={post.topComment} /> : null}
+      {!isDetails && post?.topComment ? <Comments comment={post.topComment} /> : null}
+      {!isDetails && post?.commentsCount ? <Link to={`/posts/${post.id}`}> <ShowMoreCommantBtn className="w-full" /> </Link> : null}
+
+      {comments &&
+        <div className="space-y-4">
+          {/* Comments Section */}
+          <h3 className="text-xl font-bold text-foreground">Comments ({pagination.total})</h3>
+
+          <div className="space-y-4">
+            {comments.map((comment) => (
+              <div key={comment._id || comment.id} className="p-4 sm:p-5 bg-white border border-default-200 rounded-2xl shadow-sm">
+                <div className="flex items-start gap-3 sm:gap-4">
+                  <img
+                    src={comment?.commentCreator?.photo}
+                    alt={comment?.commentCreator?.name}
+                    className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover ring-2 ring-default-100"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-semibold text-sm sm:text-base text-foreground truncate">
+                        {comment?.commentCreator?.name}
+                      </h4>
+                      <span className="text-xs text-default-500">
+                        {comment?.commentCreator?.username ? `@${comment.commentCreator.username}` : ''}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-sm text-default-700 whitespace-pre-wrap leading-relaxed">
+                      {comment?.content}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {loading && comments.length > 0 && (
+            <div className="flex justify-center py-4">
+              <Spinner size="md" />
+            </div>
+          )}
+
+          {!loading && pagination.currentPage < pagination.numberOfPages && (
+            <div className="flex justify-center pt-4">
+              <ShowMoreCommantBtn
+                onClick={() => getComments(pagination.currentPage + 1)}
+                className="w-full sm:w-auto"
+              />
+            </div>
+          )}
+
+          {!loading && comments.length === 0 && (
+            <p className="text-center text-default-500 py-8">No comments yet. Be the first to comment!</p>
+          )}
+        </div>
+
+      }
     </Card>
   );
 }

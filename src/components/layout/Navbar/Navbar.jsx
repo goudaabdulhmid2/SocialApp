@@ -21,13 +21,12 @@ const authLinks = [
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const { token, removeToken, removeUsreData} = useContext(AuthContext);
+  const { token, removeToken, userData} = useContext(AuthContext);
 
   const handleUserAction = (action) => {
     if (action === "logout") {
       setIsMenuOpen(false);
       removeToken()
-      removeUsreData()
       navigate("/login");
       return;
     }
@@ -62,6 +61,16 @@ export default function Navbar() {
         : "bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-slate-900",
     ].join(" ");
 
+  const userAvatarPhoto = userData?.photo;
+  const userAvatarFallback = userData?.name
+    ? userData.name
+        .split(" ")
+        .map((part) => part[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase()
+    : "HM";
+
   return (
     <header className="border-b border-emerald-100/70 bg-white/90 shadow-sm backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 md:px-6">
@@ -90,12 +99,13 @@ export default function Navbar() {
                 <Dropdown.Trigger className="flex items-center gap-2 rounded-full border border-emerald-100 bg-white px-2 py-1.5 shadow-sm transition hover:border-emerald-200 hover:bg-emerald-50">
                   <span className="flex items-center gap-2">
                     <Avatar size="sm" color="success" className="h-9 w-9">
+                      <Avatar.Image src={userAvatarPhoto} alt={userData?.name || "User avatar"} />
                       <Avatar.Fallback className="text-sm font-semibold">
-                        HM
+                        {userAvatarFallback}
                       </Avatar.Fallback>
                     </Avatar>
                     <span className="hidden text-sm font-medium text-slate-700 lg:inline">
-                      Hamid
+                      {userData?.name}
                     </span>
                   </span>
                 </Dropdown.Trigger>
@@ -170,12 +180,13 @@ export default function Navbar() {
                 <div className="mt-2 rounded-2xl border border-emerald-100 bg-emerald-50 p-3">
                   <div className="mb-3 flex items-center gap-3">
                     <Avatar size="sm" color="success" className="h-10 w-10">
+                        <Avatar.Image src={userAvatarPhoto} alt={userData?.name || "User avatar"} />
                       <Avatar.Fallback className="text-sm font-semibold">
-                        HM
+                          {userAvatarFallback}
                       </Avatar.Fallback>
                     </Avatar>
                     <div>
-                      <p className="text-sm font-semibold text-slate-900">Hamid</p>
+                      <p className="text-sm font-semibold text-slate-900">{userData.name}</p>
                       <p className="text-xs text-slate-500">Account menu</p>
                     </div>
                   </div>

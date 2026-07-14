@@ -1,6 +1,8 @@
 /* eslint-disable react-refresh/only-export-components */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createContext } from "react";
+import AuthServices from "../services/AuthServices";
+import {Spinner} from "@heroui/react";
 
 export const AuthContext = createContext()
 
@@ -12,9 +14,38 @@ export default function AuthProvider({children}) {
         localStorage.getItem('userToken')
     )
 
-    const [userData, setUserData] = useState(()=>
-       JSON.parse(localStorage.getItem('userData')) 
-    );
+    const [userData, setUserData] = useState(null)
+
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(()=>{
+        if(token != null){
+            getLoggedUserData();
+        }
+    },[token])
+
+
+
+
+    async function getLoggedUserData(){
+        setIsLoading(true)
+        try{
+            const {data} = await AuthServices.getLoggedUserData();
+            console.log(data.user);
+            
+            setUserData(data.user)
+        
+        }catch(err){
+            if(err.status == 401 ){
+                console.log(err)
+                localStorage.removeItem('userToken')
+                setToken(null)
+            }
+        }finally{
+            setIsLoading(false)
+        }
+    }
+
 
     
     
@@ -29,20 +60,24 @@ export default function AuthProvider({children}) {
     }
 
     function saveUsreData(data){
-        localStorage.setItem('userData',data)
         setUserData(data)
     }
 
     function removeUsreData(){
         setUserData(null)
-        localStorage.removeItem('userData')
-
-        
+      
     }
 
-    
+    if(isLoading){
+        return (
+            <div className="flex min-h-screen items-center justify-center">
+                <Spinner />
+            </div>
+        )
+    }
+
     return (
-    <AuthContext.Provider value={{token, saveToken, removeToken, userData, saveUsreData, removeUsreData}}>
+    <AuthContext.Provider value={{token, saveToken, removeToken, userData, saveUsreData, removeUsreData, isLoading}}>
         {children}
     </AuthContext.Provider>
   )

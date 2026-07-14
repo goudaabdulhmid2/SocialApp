@@ -3,13 +3,15 @@ import axios from "axios";
 
 
 class PostServices{
+    token = localStorage.getItem('userToken');
+
     async creatPost(formData){
         const res = await axios.request({
         method: 'POST',
         url: `${import.meta.env.VITE_API_URL}/posts`,
         data: formData,
         headers: {
-          Token: localStorage.getItem('userToken'),
+          Token: this.token,
         },
       });
 
@@ -21,7 +23,7 @@ class PostServices{
                 method:'GET',
                 url:`${import.meta.env.VITE_API_URL}/posts`,
                 headers:{
-                    Token:localStorage.getItem("userToken")
+                    Token: this.token,
                 },
                 params:{
                     limit:20,
@@ -30,6 +32,20 @@ class PostServices{
 
             
             })
+        return data
+    }
+
+
+    async getPost(id){
+        const {data} = await axios.request({
+            method:'GET',
+            url:`${import.meta.env.VITE_API_URL}/posts/${id}`,
+            headers:{
+                Token:this.token
+            }
+
+        })
+
         return data
     }
 }
