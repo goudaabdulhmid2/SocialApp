@@ -4,11 +4,14 @@ import PostServices from "../../services/PostServices";
 import { showApiErrorToast } from "../../components/shared/ApiErrorDisplay/ApiErrorDisplay";
 import CommentServices from "../../services/CommentServices";
 import PostCard from "../../components/Posts/PostCard";
+import { PostContext } from "../../context/PostContext";
 import { Spinner } from "@heroui/react";
 
 export default function PostDetails() {
     const { id } = useParams();
     const [post, setPost] = useState();
+    const [refreshComments, setRefreshComments] = useState(false);
+
 
     const [comments, setComments] = useState([]);
     const [pagination, setPagination] = useState({
@@ -56,11 +59,17 @@ export default function PostDetails() {
         fetchPostAndComments();
     }, [id]);
 
+    useEffect(() => {
+        getComments(1);
+    }, [refreshComments]);
+
     return (
         <div className="max-w-2xl mx-auto p-4 sm:p-6 space-y-8 animate-appearance-in">
             {/* Post Section */}
             {post ? (
-                <PostCard post={post} comments={comments} getComments={getComments} pagination={pagination} loading={loading} isDetails={true} />
+                <PostContext.Provider value={{ triggerRefresh: () => setRefreshComments(prev => !prev) }}>
+                    <PostCard post={post} comments={comments} getComments={getComments} pagination={pagination} loading={loading} isDetails={true} />
+                </PostContext.Provider>
             ) : (
                 <div className="flex justify-center p-12">
                     <Spinner size="lg" color="primary" />

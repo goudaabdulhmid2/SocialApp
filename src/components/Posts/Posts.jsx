@@ -2,6 +2,7 @@ import PostCard from "./PostCard";
 import { useEffect, useState } from "react";
 import { Spinner } from "@heroui/react";
 import PostServices from "../../services/PostServices";
+import { PostContext } from "../../context/PostContext";
 
 export default function Posts({ refreshTrigger }) {
     const [posts, setPosts] = useState([])
@@ -38,7 +39,9 @@ export default function Posts({ refreshTrigger }) {
                                 <Spinner size="lg" label="Loading posts" />
                             </div>
                         ) : posts.length ? (
-                            posts.map(post => <PostCard post={post} key={post.id}/>)
+                            <PostContext.Provider value={{ triggerRefresh: (id) => setPosts(prev => prev.map(p => p.id === id ? { ...p, commentsCount: (p.commentsCount || 0) + 1 } : p)) }}>
+                                {posts.map(post => <PostCard post={post} key={post.id}/>)}
+                            </PostContext.Provider>
                         ) : (
                             <p className="py-12 text-center text-sm text-default-500">No posts found.</p>
                         )}

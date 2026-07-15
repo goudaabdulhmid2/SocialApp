@@ -4,6 +4,8 @@ import { FaCommentDots, FaHeart, FaImage, FaShareAlt, FaBookmark, FaArrowRight }
 import Comments from '../Comments/Comments'
 import ShowMoreCommantBtn from "../Comments/ShowMoreCommantBtn";
 import { Link } from "react-router-dom";
+import CreateComment from "../Comments/CreateComment";
+import { useState } from "react";
 
 function formatPostDate(dateValue) {
   if (!dateValue) return "Recently";
@@ -19,6 +21,8 @@ export default function PostCard({ post, comments, getComments, pagination, load
   const userHandle = post?.user?.username ? `@${post.user.username}` : "@unknown";
   const userPhoto = post?.user?.photo;
   const postImage = post?.image;
+
+  const [showCommnets, setShowComments] = useState(false)
 
 
 
@@ -67,7 +71,8 @@ export default function PostCard({ post, comments, getComments, pagination, load
             {post?.likesCount ?? 0}
           </span>
 
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-default-100 px-3 py-1.5 font-medium">
+
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-default-100 px-3 py-1.5 font-medium cursor-pointer" onClick={() => setShowComments(prev => !prev)}>
             <FaCommentDots className="text-primary" />
             {post?.commentsCount ?? 0}
           </span>
@@ -102,59 +107,73 @@ export default function PostCard({ post, comments, getComments, pagination, load
       {!isDetails && post?.topComment ? <Comments comment={post.topComment} /> : null}
       {!isDetails && post?.commentsCount ? <Link to={`/posts/${post.id}`}> <ShowMoreCommantBtn className="w-full" /> </Link> : null}
 
-      {comments &&
-        <div className="space-y-4">
-          {/* Comments Section */}
-          <h3 className="text-xl font-bold text-foreground">Comments ({pagination.total})</h3>
+      {showCommnets && !isDetails &&
+        <div className="mt-4">
+          <CreateComment postId={post?.id} />
+        </div>
+      }
 
+      {isDetails &&
+        <div className="mt-4">
+          <CreateComment postId={post?.id} />
+        </div>
+      }
+
+      {comments && (
+        <>
           <div className="space-y-4">
-            {comments.map((comment) => (
-              <div key={comment._id || comment.id} className="p-4 sm:p-5 bg-white border border-default-200 rounded-2xl shadow-sm">
-                <div className="flex items-start gap-3 sm:gap-4">
-                  <img
-                    src={comment?.commentCreator?.photo}
-                    alt={comment?.commentCreator?.name}
-                    className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover ring-2 ring-default-100"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-semibold text-sm sm:text-base text-foreground truncate">
-                        {comment?.commentCreator?.name}
-                      </h4>
-                      <span className="text-xs text-default-500">
-                        {comment?.commentCreator?.username ? `@${comment.commentCreator.username}` : ''}
-                      </span>
+            {/* Comments Section */}
+            <h3 className="text-xl font-bold text-foreground">Comments ({pagination.total})</h3>
+
+            <div className="space-y-4">
+              {comments.map((comment) => (
+                <div key={comment._id || comment.id} className="p-4 sm:p-5 bg-white border border-default-200 rounded-2xl shadow-sm">
+                  <div className="flex items-start gap-3 sm:gap-4">
+                    <img
+                      src={comment?.commentCreator?.photo}
+                      alt={comment?.commentCreator?.name}
+                      className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover ring-2 ring-default-100"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-semibold text-sm sm:text-base text-foreground truncate">
+                          {comment?.commentCreator?.name}
+                        </h4>
+                        <span className="text-xs text-default-500">
+                          {comment?.commentCreator?.username ? `@${comment.commentCreator.username}` : ''}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-sm text-default-700 whitespace-pre-wrap leading-relaxed">
+                        {comment?.content}
+                      </p>
                     </div>
-                    <p className="mt-1 text-sm text-default-700 whitespace-pre-wrap leading-relaxed">
-                      {comment?.content}
-                    </p>
                   </div>
                 </div>
+              ))}
+            </div>
+
+            {loading && comments.length > 0 && (
+              <div className="flex justify-center py-4">
+                <Spinner size="md" />
               </div>
-            ))}
+            )}
+
+            {!loading && pagination.currentPage < pagination.numberOfPages && (
+              <div className="flex justify-center pt-4">
+                <ShowMoreCommantBtn
+                  onClick={() => getComments(pagination.currentPage + 1)}
+                  className="w-full sm:w-auto"
+                />
+              </div>
+            )}
+
+            {!loading && comments.length === 0 && (
+              <p className="text-center text-default-500 py-8">No comments yet. Be the first to comment!</p>
+            )}
           </div>
 
-          {loading && comments.length > 0 && (
-            <div className="flex justify-center py-4">
-              <Spinner size="md" />
-            </div>
-          )}
-
-          {!loading && pagination.currentPage < pagination.numberOfPages && (
-            <div className="flex justify-center pt-4">
-              <ShowMoreCommantBtn
-                onClick={() => getComments(pagination.currentPage + 1)}
-                className="w-full sm:w-auto"
-              />
-            </div>
-          )}
-
-          {!loading && comments.length === 0 && (
-            <p className="text-center text-default-500 py-8">No comments yet. Be the first to comment!</p>
-          )}
-        </div>
-
-      }
+        </>
+      )}
     </Card>
   );
 }

@@ -1,7 +1,8 @@
-import { useContext } from "react";
-import { FaImage, FaSmile, FaGlobe, FaPaperPlane } from "react-icons/fa";
+import { useContext, useState, useEffect } from "react";
+import { FaImage, FaSmile, FaGlobe, FaPaperPlane, FaTimes } from "react-icons/fa";
 import { AuthContext } from "../../context/AuthContext";
 import createPostSchema from "../../schemas/posts/createPost.schema";
+import EmojiPicker from "emoji-picker-react";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,16 +10,36 @@ import ValidationMessage from "../shared/ValidationMessage/ValidationMessage";
 
 import SubmitButton from "../shared/submitButton/SubmitButton";
 import PostServices from "../../services/PostServices";
+import { showApiErrorToast } from "../shared/ApiErrorDisplay/ApiErrorDisplay";
 
 export default function CreatePost({ onPostCreated }) {
   const { userData } = useContext(AuthContext);
   const { photo, name } = userData;
-  
-  
-  const { register, control, handleSubmit, reset } = useForm({
+
+
+  const { register, control, handleSubmit, reset, watch, setValue, getValues } = useForm({
     resolver: zodResolver(createPostSchema),
     mode: "onChange",
   });
+
+  const imageFiles = watch("image");
+  const [imagePreview, setImagePreview] = useState(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
+  const onEmojiClick = (emojiObject) => {
+    const currentBody = getValues('body') || "";
+    setValue('body', currentBody + emojiObject.emoji, { shouldValidate: true, shouldDirty: true });
+  };
+
+  useEffect(() => {
+    if (imageFiles && imageFiles.length > 0) {
+      const url = URL.createObjectURL(imageFiles[0]);
+      setImagePreview(url);
+      return () => URL.revokeObjectURL(url);
+    } else {
+      setImagePreview(null);
+    }
+  }, [imageFiles]);
 
   async function onSubmit(data) {
     try {
@@ -33,9 +54,10 @@ export default function CreatePost({ onPostCreated }) {
 
       console.log(res);
       reset({ body: "", image: null });
+      setShowEmojiPicker(false);
       onPostCreated?.();
     } catch (err) {
-      console.log(err);
+      showApiErrorToast(err)
     }
   }
 
@@ -70,11 +92,25 @@ export default function CreatePost({ onPostCreated }) {
             placeholder={`What's on your mind, ${name}?`}
             className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-[17px] leading-relaxed text-slate-800 outline-none transition focus:border-[#1877f2] focus:bg-white"
           />
-            <ValidationMessage name='body' control={control} />
-          
+          <ValidationMessage name='body' control={control} />
+
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-border pt-3">
+        {imagePreview && (
+          <div className="relative mt-3 rounded-2xl border border-slate-200 overflow-hidden bg-slate-50">
+            <img src={imagePreview} alt="Preview" className="max-h-105 w-full object-cover" />
+            <button
+              type="button"
+              onClick={() => setValue('image', null)}
+              className="absolute top-3 right-3 bg-slate-900/50 text-white p-2 rounded-full hover:bg-slate-900/80 transition backdrop-blur-sm"
+              aria-label="Remove image"
+            >
+              <FaTimes className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-slate-200 pt-3">
           <div className="relative flex items-center gap-2">
             <label className="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100">
               <FaImage className="text-emerald-600 h-4 w-4" />
@@ -83,10 +119,22 @@ export default function CreatePost({ onPostCreated }) {
             </label>
             <ValidationMessage name='image' control={control} />
 
-            <button type="button" className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100">
-              <FaSmile className="text-amber-500 h-4 w-4" />
-              <span className="hidden sm:inline">Feeling/activity</span>
-            </button>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowEmojiPicker((prev) => !prev)}
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+              >
+                <FaSmile className="text-amber-500 h-4 w-4" />
+                <span className="hidden sm:inline">Feeling/activity</span>
+              </button>
+
+              {showEmojiPicker && (
+                <div className="absolute z-50 top-full mt-2 left-0 shadow-2xl rounded-lg">
+                  <EmojiPicker onEmojiClick={onEmojiClick} />
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center gap-3">
