@@ -155,7 +155,8 @@ export default function PostCard({ post, comments, getComments, pagination, load
           )}
         </div>
       </div>
-      {!isDetails && post?.topComment ? <Comments comment={post.topComment} /> : null}
+      {/* Top Comment Preview */}
+      {!isDetails && post?.topComment ? <Comments comment={post.topComment} isPreview /> : null}
       {!isDetails && post?.commentsCount ? <Link to={`/posts/${post.id}`}> <ShowMoreCommantBtn className="w-full" /> </Link> : null}
 
       {showCommnets && !isDetails &&
@@ -178,28 +179,7 @@ export default function PostCard({ post, comments, getComments, pagination, load
 
             <div className="space-y-4">
               {comments.map((comment) => (
-                <div key={comment._id || comment.id} className="p-4 sm:p-5 bg-white border border-default-200 rounded-2xl shadow-sm">
-                  <div className="flex items-start gap-3 sm:gap-4">
-                    <img
-                      src={comment?.commentCreator?.photo}
-                      alt={comment?.commentCreator?.name}
-                      className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover ring-2 ring-default-100"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-semibold text-sm sm:text-base text-foreground truncate">
-                          {comment?.commentCreator?.name}
-                        </h4>
-                        <span className="text-xs text-default-500">
-                          {comment?.commentCreator?.username ? `@${comment.commentCreator.username}` : ''}
-                        </span>
-                      </div>
-                      <p className="mt-1 text-sm text-default-700 whitespace-pre-wrap leading-relaxed">
-                        {comment?.content}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <Comments key={comment._id || comment.id} comment={comment} />
               ))}
             </div>
 

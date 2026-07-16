@@ -12,6 +12,7 @@ import CommentServices from "../../services/CommentServices";
 import { PostContext } from "../../context/PostContext";
 
 
+
 export default function CreateComment({ postId }) {
   const { triggerRefresh } = useContext(PostContext);
 
@@ -24,6 +25,8 @@ export default function CreateComment({ postId }) {
   const imageFiles = watch('image')
   const [imagePreview, setImagePreview] = useState(null)
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
+
+
 
   const onEmojiClick = (emojiObject) => {
     const currentBody = getValues('content') || "";
