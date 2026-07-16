@@ -39,7 +39,10 @@ export default function Posts({ refreshTrigger }) {
                                 <Spinner size="lg" label="Loading posts" />
                             </div>
                         ) : posts.length ? (
-                            <PostContext.Provider value={{ triggerRefresh: (id) => setPosts(prev => prev.map(p => p.id === id ? { ...p, commentsCount: (p.commentsCount || 0) + 1 } : p)) }}>
+                            <PostContext.Provider value={{ 
+                                triggerRefresh: (id) => setPosts(prev => prev.map(p => p.id === id ? { ...p, commentsCount: (p.commentsCount || 0) + 1 } : p)),
+                                onPostDeleted: (id) => setPosts(prev => prev.filter(p => p.id !== id))
+                            }}>
                                 {posts.map(post => <PostCard post={post} key={post.id}/>)}
                             </PostContext.Provider>
                         ) : (

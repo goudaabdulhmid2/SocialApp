@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import PostServices from "../../services/PostServices";
 import { showApiErrorToast } from "../../components/shared/ApiErrorDisplay/ApiErrorDisplay";
 import CommentServices from "../../services/CommentServices";
@@ -9,7 +9,8 @@ import { Spinner } from "@heroui/react";
 
 export default function PostDetails() {
     const { id } = useParams();
-    const [post, setPost] = useState();
+    const navigate = useNavigate();
+    const [post, setPost] = useState(null);
     const [refreshComments, setRefreshComments] = useState(false);
 
 
@@ -67,7 +68,10 @@ export default function PostDetails() {
         <div className="max-w-2xl mx-auto p-4 sm:p-6 space-y-8 animate-appearance-in">
             {/* Post Section */}
             {post ? (
-                <PostContext.Provider value={{ triggerRefresh: () => setRefreshComments(prev => !prev) }}>
+                <PostContext.Provider value={{ 
+                    triggerRefresh: () => setRefreshComments(prev => !prev),
+                    onPostDeleted: () => navigate("/", { replace: true })
+                }}>
                     <PostCard post={post} comments={comments} getComments={getComments} pagination={pagination} loading={loading} isDetails={true} />
                 </PostContext.Provider>
             ) : (

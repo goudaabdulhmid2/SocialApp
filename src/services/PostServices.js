@@ -36,10 +36,10 @@ class PostServices{
     }
 
 
-    async getPost(id){
+    async getPost(postId){
         const {data} = await axios.request({
             method:'GET',
-            url:`${import.meta.env.VITE_API_URL}/posts/${id}`,
+            url:`${import.meta.env.VITE_API_URL}/posts/${postId}`,
             headers:{
                 Token:this.token
             }
@@ -48,6 +48,34 @@ class PostServices{
 
         return data
     }
+
+    async deletePost(postId){
+       const {data} = await axios.request({
+            method:"DELETE",
+            url:`${import.meta.env.VITE_API_URL}/posts/${postId}`,
+            headers:{
+                Token:this.token
+            }
+
+        })
+
+        return data
+    }
+
+    async savePost(postId){
+       const {data} = await axios.request({
+            method:"PUT",
+            url:`${import.meta.env.VITE_API_URL}/posts/${postId}/bookmark`,
+            headers:{
+                Token:this.token
+            }
+
+        })
+
+        return data
+    }
+
+
 }
 
 

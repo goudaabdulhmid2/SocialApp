@@ -106,7 +106,7 @@ export default function CreateComment({ postId }) {
               <FiSmile className="h-5 w-5" />
             </button>
             {showEmojiPicker && (
-              <div className="absolute top-10 left-0 z-50">
+              <div className="absolute bottom-full mb-2 left-0 z-50 shadow-2xl rounded-lg">
                 <EmojiPicker onEmojiClick={(e) => onEmojiClick(e.emoji)} />
               </div>
             )}
