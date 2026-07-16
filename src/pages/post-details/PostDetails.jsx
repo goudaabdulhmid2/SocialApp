@@ -70,7 +70,8 @@ export default function PostDetails() {
             {post ? (
                 <PostContext.Provider value={{ 
                     triggerRefresh: () => setRefreshComments(prev => !prev),
-                    onPostDeleted: () => navigate("/", { replace: true })
+                    onPostDeleted: () => navigate("/", { replace: true }),
+                    onCommentDeleted: (commentId) => setComments(prev => prev.filter(c => c._id !== commentId && c.id !== commentId))
                 }}>
                     <PostCard post={post} comments={comments} getComments={getComments} pagination={pagination} loading={loading} isDetails={true} />
                 </PostContext.Provider>

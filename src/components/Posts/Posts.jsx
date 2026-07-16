@@ -41,7 +41,15 @@ export default function Posts({ refreshTrigger }) {
                         ) : posts.length ? (
                             <PostContext.Provider value={{ 
                                 triggerRefresh: (id) => setPosts(prev => prev.map(p => p.id === id ? { ...p, commentsCount: (p.commentsCount || 0) + 1 } : p)),
-                                onPostDeleted: (id) => setPosts(prev => prev.filter(p => p.id !== id))
+                                onPostDeleted: (id) => setPosts(prev => prev.filter(p => p.id !== id)),
+                                onCommentDeleted: (commentId) => {
+                                    setPosts(prev => prev.map(p => {
+                                        if (p.topComment && (p.topComment._id === commentId || p.topComment.id === commentId)) {
+                                            return { ...p, topComment: null, commentsCount: Math.max(0, (p.commentsCount || 1) - 1) };
+                                        }
+                                        return p;
+                                    }));
+                                }
                             }}>
                                 {posts.map(post => <PostCard post={post} key={post.id}/>)}
                             </PostContext.Provider>

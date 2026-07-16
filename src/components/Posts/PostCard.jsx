@@ -40,7 +40,7 @@ export default function PostCard({ post, comments, getComments, pagination, load
       onPostDeleted?.(post.id);
     } catch (error) {
       showApiErrorToast(error);
-    } 
+    }
   };
 
   const menuItems = [
@@ -82,10 +82,10 @@ export default function PostCard({ post, comments, getComments, pagination, load
             <Dropdown.Popover>
               <Dropdown.Menu aria-label="Post actions" items={menuItems}>
                 {(item) => (
-                  <Dropdown.Item 
-                    key={item.key} 
-                    className={item.isDanger ? "text-danger" : ""} 
-                    color={item.isDanger ? "danger" : "default"} 
+                  <Dropdown.Item
+                    key={item.key}
+                    className={item.isDanger ? "text-danger" : ""}
+                    color={item.isDanger ? "danger" : "default"}
                     startContent={item.icon}
                     onPress={() => {
                       if (item.key === 'delete') handlePostDelete();
@@ -156,7 +156,10 @@ export default function PostCard({ post, comments, getComments, pagination, load
         </div>
       </div>
       {/* Top Comment Preview */}
-      {!isDetails && post?.topComment ? <Comments comment={post.topComment} isPreview /> : null}
+      {!isDetails && post?.topComment ? (
+
+        <Comments comment={post.topComment} postId={post.id} isPreview />
+      ) : null}
       {!isDetails && post?.commentsCount ? <Link to={`/posts/${post.id}`}> <ShowMoreCommantBtn className="w-full" /> </Link> : null}
 
       {showCommnets && !isDetails &&
@@ -179,7 +182,7 @@ export default function PostCard({ post, comments, getComments, pagination, load
 
             <div className="space-y-4">
               {comments.map((comment) => (
-                <Comments key={comment._id || comment.id} comment={comment} />
+                <Comments key={comment._id || comment.id} comment={comment} postId={post.id} />
               ))}
             </div>
 

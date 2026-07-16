@@ -2,7 +2,10 @@ import { Card, Dropdown } from "@heroui/react";
 import { useContext } from "react";
 import { FaEllipsisH, FaPen, FaTrash } from "react-icons/fa";
 import { AuthContext } from "../../context/AuthContext";
-
+import { PostContext } from "../../context/PostContext";
+import CommentServices from "../../services/CommentServices";
+import { toast } from "react-hot-toast";
+import { showApiErrorToast } from "../shared/ApiErrorDisplay/ApiErrorDisplay";
 
 function formatCommentDate(dateValue) {
   if (!dateValue) return "Just now";
@@ -13,13 +16,16 @@ function formatCommentDate(dateValue) {
   }).format(new Date(dateValue));
 }
 
-export default function Comments({ comment, isPreview = false }) {
+export default function Comments({ postId, comment, isPreview = false }) {
   const commenterName = comment?.commentCreator?.name ?? "Unknown user";
   const commenterHandle = comment?.commentCreator?.username ? `@${comment.commentCreator.username}` : "@unknown";
   const commenterPhoto = comment?.commentCreator?.photo;
   const commentBody = comment?.content ?? "No comment content available.";
 
   const { userData } = useContext(AuthContext);
+  const { onCommentDeleted } = useContext(PostContext);
+
+
 
   const menuItems = [
     { key: "edit", label: "Edit comment", icon: <FaPen className="text-default-500" /> },
@@ -68,6 +74,9 @@ export default function Comments({ comment, isPreview = false }) {
                   className={item.isDanger ? "text-danger" : ""}
                   color={item.isDanger ? "danger" : "default"}
                   startContent={item.icon}
+                  onPress={() => {
+                    if (item.key === 'delete') handleDeleteComment();
+                  }}
                 >
                   {item.label}
                 </Dropdown.Item>
@@ -78,6 +87,18 @@ export default function Comments({ comment, isPreview = false }) {
       )}
     </div>
   );
+
+  const handleDeleteComment = async () => {
+    if (!window.confirm("Are you sure you want to delete this comment?")) return;
+
+    try {
+      await CommentServices.deleteComment(postId, comment._id);
+      toast.success("Comment deleted successfully");
+      onCommentDeleted?.(comment._id);
+    } catch (error) {
+      showApiErrorToast(error);
+    }
+  };
 
   if (isPreview) {
     return (

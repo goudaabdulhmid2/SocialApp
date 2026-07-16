@@ -23,20 +23,31 @@ class CommentServices {
         return data
     }
 
-    async createComment(postId, formData ){
-        const {data} = await axios.request({
-            method:'POST',
+    async createComment(postId, formData) {
+        const { data } = await axios.request({
+            method: 'POST',
             url: `${import.meta.env.VITE_API_URL}/posts/${postId}/comments`,
             headers: {
                 Token: this.token,
             },
-            data:formData
+            data: formData
 
         })
 
         return data;
     }
 
+    async deleteComment(postId, commentId) {
+        const { data } = await axios.request({
+            method: 'DELETE',
+            url: `${import.meta.env.VITE_API_URL}/posts/${postId}/comments/${commentId}`,
+            headers: {
+                Token: this.token,
+            },
+
+        })
+        return data;
+    }
 
 
 
